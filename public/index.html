@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket.io Chat App</title>
+</head>
+<body>
+  <ul id="messages"></ul>
+  <form id="form" action="#">
+    <input id="input" autocomplete="off" /><button>Send</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    const socket = io();
+
+    const username = prompt('Enter your username:');
+    socket.emit('join', username);
+
+    $('#form').submit((e) => {
+      e.preventDefault(); // Prevent the page from refreshing
+      const message = $('#input').val();
+      socket.emit('chat message', message);
+      $('#input').val('');
+      return false;
+    });
+
+    socket.on('chat message', (data) => {
+      $('#messages').append($('<li>').text(`${data.username}: ${data.message}`));
+    });
+
+    socket.on('user joined', (username) => {
+      $('#messages').append($('<li>').text(`${username} joined the chat`));
+    });
+
+    socket.on('user left', (username) => {
+      $('#messages').append($('<li>').text(`${username} left the chat`));
+    });
+  </script>
+</body>
+</html>
